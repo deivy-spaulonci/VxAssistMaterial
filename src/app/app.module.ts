@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -14,19 +15,33 @@ import {MatGridListModule} from '@angular/material/grid-list';
 import {MatInputModule} from '@angular/material/input'; 
 import {MatFormFieldModule} from '@angular/material/form-field'; 
 import {MatAutocompleteModule} from '@angular/material/autocomplete'; 
+import {MatCardModule} from '@angular/material/card'; 
+import {MatSnackBarModule} from '@angular/material/snack-bar'; 
 
 import { FormDespesaComponent } from './page/despesa/form-despesa/form-despesa.component'; 
 
+import { NgxMaskModule, IConfig } from 'ngx-mask';
+import { HomeComponent } from './page/home/home.component';
+import { ListDespesaComponent } from './page/despesa/list-despesa/list-despesa.component'
+
+const maskConfig: Partial<IConfig> = {
+  validation: false,
+};
 
 @NgModule({
   declarations: [
     AppComponent,
-    FormDespesaComponent
+    FormDespesaComponent,
+    HomeComponent,
+    ListDespesaComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    FormsModule,
+    ReactiveFormsModule,
     BrowserAnimationsModule,
+    NgxMaskModule.forRoot(maskConfig),
     MatSliderModule,
     MatToolbarModule,
     MatIconModule,
@@ -35,7 +50,9 @@ import { FormDespesaComponent } from './page/despesa/form-despesa/form-despesa.c
     MatGridListModule,
     MatInputModule,
     MatFormFieldModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    MatCardModule,
+    MatSnackBarModule
   ],
   providers: [],
   bootstrap: [AppComponent]

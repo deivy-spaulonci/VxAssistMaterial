@@ -1,23 +1,45 @@
-<p>form-despesa works!</p>
+<mat-grid-list cols="1" rowHeight="400">
+    <mat-grid-tile>
+        <form class="example-form" [formGroup]="despesaform" (ngSubmit)="onSubmit(despesaform.value)" style="max-width: 600px;">
+            <mat-card class="example-card">
+                <mat-toolbar color="primary">
+                    <span>Despesa</span>
+                    <span class="example-spacer"></span>
+                    <button mat-icon-button [routerLink]="'/list-despesa'">
+                        <mat-icon>list</mat-icon>
+                      </button>
+                </mat-toolbar>
 
-<form class="example-form">
+                <mat-card-content class="paddingTop20">
 
-    <mat-form-field class="example-full-width">
-        <mat-label>Number</mat-label>
-        <input type="text"
-                placeholder="Pick one"
-                aria-label="Number"
-                matInput
-                [formControl]="myControl"
-                [matAutocomplete]="auto">
-        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-            <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-            {{option}}
-            </mat-option>
-        </mat-autocomplete>
-    </mat-form-field>
+                    <mat-form-field class="full-width">
+                        <mat-label>Tipo Despesa</mat-label>
+                        <input type="text" placeholder="Despesa" matInput formControlName="comboTipo" [matAutocomplete]="auto">
+                        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                            <mat-option *ngFor="let tipo of filteredTipos | async" [value]="tipo">
+                                {{tipo.name}}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
 
+                    <mat-form-field class="full-width">
+                        <input matInput mask="00/00/0000" placeholder="Data" formControlName="inputData">
+                    </mat-form-field>
 
-</form>
+                    <mat-form-field class="full-width">
+                        <input matInput mask="0*,00" placeholder="Valor" formControlName="inputValor">
+                    </mat-form-field>
 
-  
+                </mat-card-content>
+
+                <mat-card-actions>
+                    <mat-grid-list cols="2" rowHeight="50">
+                        <mat-grid-tile><button mat-flat-button color="primary" [disabled]="!despesaform.valid" type="submit">Salvar</button></mat-grid-tile>
+                        <mat-grid-tile><button mat-flat-button color="warn">Cancelar</button></mat-grid-tile>
+                    </mat-grid-list>
+                </mat-card-actions>
+            </mat-card>
+        </form>
+
+    </mat-grid-tile>
+</mat-grid-list>
