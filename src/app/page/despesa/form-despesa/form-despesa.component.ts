@@ -2,12 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith, } from 'rxjs/operators';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Tipo } from 'src/app/model/tipo';
 
-export interface Tipo {
-  id: number;
-  nome: string;  
-}
+import { Validator } from 'src/app/util/validator';
+import { DefaultService } from 'src/app/service/default.service';
+import { Fornecedor, FormaPagamento } from 'src/app/model/models';
+
 
 @Component({
   selector: 'app-form-despesa',
@@ -16,69 +17,83 @@ export interface Tipo {
 })
 export class FormDespesaComponent implements OnInit {
   despesaform: FormGroup;
-  comboTipoDespesa = new FormControl()
+  comboTipo = new FormControl();
+  comboFornecedor = new FormControl();
+  comboFormaPagamento = new FormControl();
 
   filteredTipos: Observable<Tipo[]>;
+  filteredFornecedores: Observable<Fornecedor[]>;
+  filteredFormasPagamento: Observable<FormaPagamento[]>;
 
-  TIPOS: Tipo[] = [
-    { id: 11, nome: 'Dr Nice' },
-    { id: 12, nome: 'Narco' },
-    { id: 13, nome: 'Bombasto' },
-    { id: 14, nome: 'Celeritas' },
-    { id: 15, nome: 'Magneta' },
-    { id: 16, nome: 'RubberMan' },
-    { id: 17, nome: 'Dynama' },
-    { id: 18, nome: 'Dr IQ' },
-    { id: 19, nome: 'Magma' },
-    { id: 20, nome: 'Tornado' }
-  ];
+  validator = new Validator();
 
-  
-  _filter = (opt: string[], value: string): string[] => {
-    const filterValue = value.toLowerCase();  
-    return opt.filter(item => item.toLowerCase().indexOf(filterValue) === 0);
-  };
+  tiposDespesa: Tipo[];
+  fornecedores: Fornecedor[];
+  formasPagamento: FormaPagamento[];
 
-  constructor(private fb: FormBuilder, private _snackBar: MatSnackBar) {
-    this.filteredOptions = this.comboTipoDespesa.valueChanges.pipe(
-      startWith(''),
-      map(state => state ? this._filterStates(state) : this.TIPOS.slice())
-    );
+  constructor(private fb: FormBuilder,
+    private defaultService: DefaultService,
+    private _snackBar: MatSnackBar) {
   }
 
   ngOnInit(): void {
     this.despesaform = this.fb.group({
       comboTipo: new FormControl('', Validators.required),
-      inputData: new FormControl('', Validators.required),
+      comboFornecedor: new FormControl('', Validators.required),
+      inputData: new FormControl('', [Validators.required, this.validator.dateValidator]),
       inputValor: new FormControl('', Validators.minLength(4)),
     });
 
-    // this.filteredOptions = this.comboTipoDespesa.valueChanges.pipe(      
-    //   startWith(''),
-    //   map(nome => this._filter(nome))      
-    // );
+    this.defaultService.get('api/tipo-despesa/allSelect').subscribe(resultado => {
+      this.tiposDespesa = resultado;
+      //this.despesaCadastro.tipoDespesa = (this.despesaCadastro.id ? this.despesaCadastro.tipoDespesa : resultado[0]);
+
+      this.defaultService.get('api/forma-pagamento/allSelect').subscribe(resultado => {
+        this.formasPagamento = resultado;
+        //   this.despesaCadastro.formaPagamento = (this.despesaCadastro.id ? this.despesaCadastro.formaPagamento : resultado[0]);
+
+        this.defaultService.get('api/fornecedor').subscribe(resultado => {
+          this.fornecedores = resultado.content;
+          //     this.despesaCadastro.fornecedor = (this.despesaCadastro.id ? this.despesaCadastro.fornecedor : resultado[0]);
+
+          //     this.defaultService.get('api/tipo-informacao-extra/allSelect').subscribe(resultado => {
+          //       this.tiposInformacaoExtra = resultado;
+          //       this.informacaoExtra.tipoInformacaoExtra = resultado[0];
+
+          //       this.defaultService.get('api/despesa/total').subscribe(resultado => {
+          //         this.total = resultado;
+
+          //         this.loading = false;
+          //       });
+
+          //     });
+          this.filteredTipos = this.comboTipo.valueChanges.pipe(
+            startWith(''),
+            map(value => typeof value === 'string' ? value : value.name),
+            map(name => name ? this._filter(name, this.tiposDespesa) : this.tiposDespesa.slice())
+          );
+
+          this.filteredFornecedores = this.comboFornecedor.valueChanges.pipe(
+            startWith(''),
+            map(value => typeof value === 'string' ? value : value.name),
+            map(name => name ? this._filter(name, this.fornecedores) : this.fornecedores.slice())
+          );
+
+        });
+      });
+
+
+    });
+
   }
 
-  // private _filter(value: string): any[] {
-  //   console.log(value)
-  //   const filterValue = value.toLowerCase();
-  //   return this.HEROES.filter(option => option.name.toLowerCase().includes(filterValue));
-  // }
-
-  // private _filterGroup(value: string): any[] {
-  //   if (value) {
-  //     return this.HEROES
-  //       .map(group => ({name: group.name, names: this._filter(group.name, value)}))
-  //       .filter(group => group.names.length > 0);
-  //   }
-
-  //   return this.HEROES;
-  // }
-
-  private _filterStates(value: string): Tipo[] {
+  private _filter(value: string, lista: any[]): any[] {
     const filterValue = value.toLowerCase();
+    return lista.filter(tipo => tipo.nome.toLowerCase().includes(filterValue));
+  }
 
-    return this.TIPOS.filter(state => state.name.toLowerCase().indexOf(filterValue) === 0);
+  displayFn(tipo: Tipo): string {
+    return tipo && tipo.nome ? tipo.nome : '';
   }
 
   onSubmit(value: string) {

@@ -14,13 +14,24 @@
 
                     <mat-form-field class="full-width">
                         <mat-label>Tipo Despesa</mat-label>
-                        <input type="text" placeholder="Despesa" matInput formControlName="comboTipo" [matAutocomplete]="auto">
-                        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                        <input type="text" placeholder="Despesa" matInput formControlName="comboTipo" [matAutocomplete]="auto" [formControl]="comboTipo">
+                        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFn">
                             <mat-option *ngFor="let tipo of filteredTipos | async" [value]="tipo">
-                                {{tipo.name}}
+                                {{tipo.nome}}
                             </mat-option>
                         </mat-autocomplete>
                     </mat-form-field>
+
+                    <mat-form-field class="full-width">
+                        <mat-label>Fornecedor</mat-label>
+                        <input type="text" placeholder="Fornecedor" matInput formControlName="comboFornecedor" [matAutocomplete]="auto" [formControl]="comboFornecedor">
+                        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFn">
+                            <mat-option *ngFor="let fornecedor of filteredFornecedores | async" [value]="fornecedor">
+                                {{fornecedor.nome}}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
+
 
                     <mat-form-field class="full-width">
                         <input matInput mask="00/00/0000" placeholder="Data" formControlName="inputData">

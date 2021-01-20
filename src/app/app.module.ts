@@ -23,6 +23,7 @@ import { FormDespesaComponent } from './page/despesa/form-despesa/form-despesa.c
 import { NgxMaskModule, IConfig } from 'ngx-mask';
 import { HomeComponent } from './page/home/home.component';
 import { ListDespesaComponent } from './page/despesa/list-despesa/list-despesa.component'
+import { HttpClientModule } from '@angular/common/http';
 
 const maskConfig: Partial<IConfig> = {
   validation: false,
@@ -39,6 +40,7 @@ const maskConfig: Partial<IConfig> = {
     BrowserModule,
     AppRoutingModule,
     FormsModule,
+    HttpClientModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
     NgxMaskModule.forRoot(maskConfig),
