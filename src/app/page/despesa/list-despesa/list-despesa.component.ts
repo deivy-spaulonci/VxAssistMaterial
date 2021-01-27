@@ -20,7 +20,7 @@ import { DefaultService } from 'src/app/service/default.service';
   ],
 })
 export class ListDespesaComponent implements AfterViewInit {
-  displayedColumns: string[] = ['id', 'tipoDespesa', 'data', 'valor'];
+  displayedColumns: string[] = ['id', 'tipoDespesa', 'fornecedor', 'data', 'formaPagamento', 'valor'];
   //  exampleDatabase: ExampleHttpDatabase | null;
    expandedElement: Despesa | null;
    data: Despesa[] = [];
@@ -34,25 +34,27 @@ export class ListDespesaComponent implements AfterViewInit {
 
    teste : Despesa[];
 
-   constructor(private defaultService: DefaultService) {
+   rows: number = 10;
 
-   }
+   constructor(private defaultService: DefaultService) {}
 
    ngAfterViewInit() {    
      
-    this.defaultService.get('api/despesa/all').subscribe(resultado => {
+    this.defaultService.get('api/despesa/all?size='+this.rows).subscribe(resultado => {
+      let dados = resultado.content;
+
       merge(this.sort.sortChange, this.paginator.page)
        .pipe(
          startWith({}),
          switchMap(() => {
            this.isLoadingResults = true;
-           return resultado.content;
+           return dados;
          }),
          map(data => {
            // Flip flag to show that loading has finished.
            this.isLoadingResults = false;
            this.isRateLimitReached = false;
-           this.resultsLength = 20;
+           this.resultsLength = this.rows;
 
            return data;
          }),
@@ -62,7 +64,7 @@ export class ListDespesaComponent implements AfterViewInit {
            this.isRateLimitReached = true;
            return observableOf([]);
          })
-       ).subscribe(data => this.data = data);  
+       ).subscribe(data => this.data = dados);  
               
     });
 
