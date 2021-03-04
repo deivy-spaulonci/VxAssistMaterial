@@ -1,11 +1,12 @@
 import {Component, ViewChild, AfterViewInit} from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
-import {merge, of as observableOf} from 'rxjs';
-import {catchError, map, startWith, switchMap} from 'rxjs/operators';
+import {merge, Observable, of as observableOf} from 'rxjs';
+import {catchError, map, startWith, switchMap, tap} from 'rxjs/operators';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import { Despesa } from 'src/app/model/models';
 import { DefaultService } from 'src/app/service/default.service';
+import {log} from "util";
 
 @Component({
   selector: 'app-list-despesa',
@@ -23,7 +24,7 @@ export class ListDespesaComponent implements AfterViewInit {
   displayedColumns: string[] = ['id', 'tipoDespesa', 'fornecedor', 'data', 'formaPagamento', 'valor'];
   //  exampleDatabase: ExampleHttpDatabase | null;
    expandedElement: Despesa | null;
-   data: Despesa[] = [];
+   dados: Despesa[] = [];
 
    resultsLength = 0;
    isLoadingResults = true;
@@ -32,51 +33,79 @@ export class ListDespesaComponent implements AfterViewInit {
    @ViewChild(MatPaginator) paginator: MatPaginator;
    @ViewChild(MatSort) sort: MatSort;
 
-   teste : Despesa[];
-
-   rows: number = 10;
+   rows: number = 12;
 
    constructor(private defaultService: DefaultService) {}
 
-   ngAfterViewInit() {    
-     
+   ngAfterViewInit() {
+
+    this.isLoadingResults = true;
     this.defaultService.get('api/despesa/all?size='+this.rows).subscribe(resultado => {
-      let dados = resultado.content;
-
-      merge(this.sort.sortChange, this.paginator.page)
-       .pipe(
-         startWith({}),
-         switchMap(() => {
-           this.isLoadingResults = true;
-           return dados;
-         }),
-         map(data => {
-           // Flip flag to show that loading has finished.
-           this.isLoadingResults = false;
-           this.isRateLimitReached = false;
-           this.resultsLength = this.rows;
-
-           return data;
-         }),
-         catchError(() => {
-           this.isLoadingResults = false;
-           // Catch if the GitHub API has reached its rate limit. Return empty data.
-           this.isRateLimitReached = true;
-           return observableOf([]);
-         })
-       ).subscribe(data => this.data = dados);  
-              
+      this.dados = resultado.content;
+      this.isLoadingResults = false;
     });
 
+     // merge(this.sort.sortChange, this.paginator.page)
+     //   .pipe(
+     //     startWith({}),
+     //     switchMap(() => {
+     //       this.isLoadingResults = true;
+     //       return this.dado
+     //     }),
+     //     map(data => {
+     //       // Flip flag to show that loading has finished.
+     //       this.isLoadingResults = false;
+     //       this.isRateLimitReached = false;
+     //       this.resultsLength = this.rows;
+     //
+     //       return data;
+     //     }),
+     //     catchError(() => {
+     //       this.isLoadingResults = false;
+     //       // Catch if the GitHub API has reached its rate limit. Return empty data.
+     //       this.isRateLimitReached = true;
+     //       return observableOf(Despea[]);
+     //     })
+     //   ).subscribe(data => this.dados = data);
+
+
+     //
+     // merge(this.sort.sortChange, this.paginator.page)
+     //   .pipe(
+     //     startWith({}),
+     //     switchMap(() => {
+     //       this.isLoadingResults = true;
+     //       return dados;
+     //     }),
+     //     map(data => {
+     //       // Flip flag to show that loading has finished.
+     //       this.isLoadingResults = false;
+     //       this.isRateLimitReached = false;
+     //       this.resultsLength = this.rows;
+     //
+     //       return data;
+     //     }),
+     //     catchError(() => {
+     //       this.isLoadingResults = false;
+     //       // Catch if the GitHub API has reached its rate limit. Return empty data.
+     //       this.isRateLimitReached = true;
+     //       return observableOf([]);
+     //     })
+     //   ).subscribe(data => this.data = dados);
+
      // If the user changes the sort order, reset back to the first page.
-     this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+     //this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
 
 
    }
 
+   // getDespesas(){
+   //   this.defaultService.get('api/despesa/all?size='+this.rows).subscribe(resultado => this.dados = resultado.content);
+   // }
+
  }
 
- 
+
  /** An example database that the data source uses to retrieve data for the table. */
 //  export class ExampleHttpDatabase {
 //    constructor(private _httpClient: HttpClient) {}
